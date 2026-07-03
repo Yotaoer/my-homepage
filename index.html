@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>回家の路</title>
+
+<!-- ====================== 样式表 ====================== -->
+<style>
+  /* ---- 全局变量：默认深色模式 ---- */
+  :root {
+    --bg-gradient: linear-gradient(135deg, #0a1530 0%, #1a0b2e 50%, #120028 100%);
+    --card-bg: rgba(255, 255, 255, 0.06);
+    --card-border: rgba(255, 255, 255, 0.12);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --text-main: #f0f4ff;
+    --text-sub: #aab3d0;
+    --accent: #7b5cff;
+    --accent-hover: #9a82ff;
+    --divider: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ---- 明亮模式变量 ---- */
+  body.light-mode {
+    --bg-gradient: linear-gradient(135deg, #e8ecff 0%, #f3e8ff 50%, #fff0f7 100%);
+    --card-bg: rgba(255, 255, 255, 0.65);
+    --card-border: rgba(120, 120, 200, 0.18);
+    --card-shadow: 0 8px 32px rgba(80, 80, 140, 0.18);
+    --text-main: #1f2340;
+    --text-sub: #5a6080;
+    --accent: #5b40e0;
+    --accent-hover: #7b62f0;
+    --divider: rgba(50, 50, 100, 0.12);
+  }
+
+  /* ---- 基础重置 ---- */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    color: var(--text-main);
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    transition: background 0.5s ease, color 0.5s ease;
+  }
+
+  /* ---- 背景粒子画布 ---- */
+  #particles-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ---- 顶部导航栏 ---- */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 6%;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .logo {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .logo .title-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeInChar 0.5s ease forwards;
+  }
+  @keyframes fadeInChar {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .theme-toggle {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+  }
+  .theme-toggle:hover {
+    transform: rotate(20deg) scale(1.08);
+    border-color: var(--accent);
+  }
+
+  /* ---- 主内容容器 ---- */
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 20px;
+  }
+
+  /* ---- 卡片通用样式（毛玻璃效果） ---- */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 32px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+    .tool-card.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* ---- 个人简介区域 ---- */
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3a4060, #5a4090);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: rgba(255,255,255,0.85);
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    border: 3px solid var(--card-border);
+    overflow: hidden;  /* 关键：裁剪溢出内容，确保圆形效果 */
+  }
+  .avatar img {
+    width: 100%;     /* 强制图片填满容器宽度 */
+    height: 100%;    /* 强制图片填满容器高度 */
+    object-fit: cover; /* 保持比例裁切，不变形 */
+    display: block;
+    border-radius: 50%;
+  }
+  .profile-info { flex: 1; min-width: 220px; }
+  .profile-info h2 {
+    font-size: 1.7rem;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--accent), var(--text-main));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .profile-info .tag {
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .profile-info p {
+    font-size: 0.98rem;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+
+  /* ---- 工具箱标题 ---- */
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 4px solid var(--accent);
+  }
+
+  /* ---- 工具卡片网格 ---- */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .tool-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 22px;
+    text-align: center;
+    cursor: default;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .tool-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 36px rgba(123, 92, 255, 0.25);
+    border-color: var(--accent);
+  }
+  .tool-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .tool-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .tool-desc {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    margin-bottom: 14px;
+  }
+  .tool-btn {
+    display: inline-block;
+    padding: 7px 22px;
+    background: linear-gradient(135deg, var(--accent), #4a2ed8);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .tool-btn:hover {
+    background: linear-gradient(135deg, var(--accent-hover), #6a4af0);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(123, 92, 255, 0.4);
+  }
+
+  /* ---- 访问计数器 ---- */
+  .counter {
+    text-align: center;
+    padding: 24px;
+    font-size: 1.15rem;
+    color: var(--text-sub);
+  }
+  .counter-num {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 6px;
+    display: inline-block;
+    animation: pulse 2s infinite;
+    text-shadow: 0 0 20px rgba(123, 92, 255, 0.5);
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  /* ---- 页脚 ---- */
+  .footer {
+    text-align: center;
+    padding: 20px 0 30px;
+    color: var(--text-sub);
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-divider {
+    max-width: 600px;
+    margin: 0 auto 15px;
+    height: 1px;
+    background: var(--divider);
+    border: none;
+  }
+
+  /* ---- 个人数据栏目 ---- */
+  .profile-data {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .data-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--text-main);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .data-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 0%, transparent 40%, rgba(123, 92, 255, 0.12) 50%, transparent 60%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .data-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 14px 38px rgba(123, 92, 255, 0.28);
+  }
+  .data-card:hover::before {
+    transform: translateX(100%);
+  }
+  .data-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #fff;
+    transition: transform 0.4s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  .data-card:hover .data-icon {
+    transform: rotate(-8deg) scale(1.12);
+  }
+  .data-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .data-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .data-desc {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .data-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .data-btn {
+    padding: 5px 12px;
+    background: linear-gradient(135deg, var(--accent), #4a2ed8);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+  }
+  .data-btn:hover {
+    background: linear-gradient(135deg, var(--accent-hover), #6a4af0);
+    transform: scale(1.08);
+    box-shadow: 0 3px 10px rgba(123, 92, 255, 0.4);
+  }
+  .data-btn.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+  }
+  .data-btn.secondary:hover {
+    background: rgba(123, 92, 255, 0.2);
+    border-color: var(--accent);
+  }
+  .data-btn.danger {
+    background: linear-gradient(135deg, #ff5c7a, #d83a5a);
+  }
+  .data-btn.danger:hover {
+    background: linear-gradient(135deg, #ff7a93, #e04a6a);
+    box-shadow: 0 3px 10px rgba(255, 92, 122, 0.4);
+  }
+
+  /* ---- 管理按钮组 ---- */
+  .manage-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .manage-btn {
+    padding: 8px 18px;
+    background: linear-gradient(135deg, var(--accent), #4a2ed8);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+  }
+  .manage-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(123, 92, 255, 0.35);
+  }
+  .manage-btn.ghost {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+  }
+  .manage-btn.ghost:hover {
+    background: rgba(123, 92, 255, 0.15);
+    border-color: var(--accent);
+  }
+  .manage-btn.warn {
+    background: linear-gradient(135deg, #ff8c4a, #e85a2e);
+  }
+
+  /* ---- 编辑模式高亮 ---- */
+  .edit-mode .data-card,
+  .edit-mode .tool-card {
+    outline: 2px dashed rgba(123, 92, 255, 0.4);
+    outline-offset: 4px;
+  }
+
+  /* ---- 模态框 ---- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+  }
+  .modal-overlay.show {
+    display: flex;
+    opacity: 1;
+  }
+  .modal {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .modal h3 {
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    background: linear-gradient(90deg, var(--accent), var(--text-main));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 0.92rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(123, 92, 255, 0.08);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .color-picker-hint {
+    font-size: 0.78rem;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .modal-actions button {
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .modal-actions .btn-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+  }
+  .modal-actions .btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .modal-actions .btn-save {
+    background: linear-gradient(135deg, var(--accent), #4a2ed8);
+    color: #fff;
+  }
+  .modal-actions .btn-save:hover {
+    transform: scale(1.05);
+  }
+
+  /* ---- 空状态 ---- */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-sub);
+    font-size: 0.95rem;
+    grid-column: 1 / -1;
+  }
+  .empty-state .big-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.6;
+  }
+  .toast {
+    position: fixed;
+    top: 88px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--accent), #4a2ed8);
+    color: #fff;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    box-shadow: 0 8px 28px rgba(123, 92, 255, 0.45);
+    transition: all 0.4s ease;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* ---- 响应式：手机适配 ---- */
+  @media (max-width: 640px) {
+    .profile { justify-content: center; text-align: center; }
+    .avatar { width: 100px; height: 100px; font-size: 2.8rem; }
+    .profile-info h2 { font-size: 1.4rem; }
+    .card { padding: 22px; }
+    .logo { font-size: 1.1rem; }
+    .counter-num { font-size: 1.8rem; }
+    .section-title { font-size: 1.3rem; }
+    .data-card { padding: 14px 16px; }
+    .data-icon { width: 44px; height: 44px; font-size: 1.3rem; }
+    .data-actions { flex-direction: row; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- 背景粒子画布 -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ========== 顶部导航栏 ========== -->
+<header class="header">
+  <!-- 网站名称（会加上打字淡入效果） -->
+  <div class="logo" id="logo-text">🛠️ 我的工具箱</div>
+  <!-- 主题切换按钮 -->
+  <button class="theme-toggle" id="theme-toggle" title="切换主题">🌙</button>
+</header>
+
+<!-- ========== 主内容区 ========== -->
+<main class="container">
+  <!-- ---------- 个人简介区域 ---------- -->
+  <section class="card profile">
+    <!-- 左侧：圆形头像（使用 avatar.jpg，放在同目录下） -->
+    <div class="avatar"><img src="avatar.jpg" alt="头像" /></div>
+    <!-- 右侧：姓名 + 简介 -->
+    <div class="profile-info">
+      <h2>Yotao sama的家</h2>
+      <div class="tag">💻 你来迟了 | 已售罄</div>
+      <p id="random-tip">加载中...</p>
+    </div>
+  </section>
+
+  <!-- ---------- 工具箱区域 ---------- -->
+  <section class="card">
+    <h3 class="section-title">📦 我的快捷工具箱</h3>
+    <div class="manage-bar">
+      <button class="manage-btn" onclick="openEditModal('tool', -1)">➕ 添加工具</button>
+      <button class="manage-btn ghost" onclick="toggleEditMode()">✏️ <span id="edit-mode-label">编辑模式</span></button>
+      <button class="manage-btn ghost" onclick="syncToCloud()">☁️ <span id="sync-label">保存到云端</span></button>
+      <button class="manage-btn warn" onclick="resetLocal()">🔄 恢复云端</button>
+    </div>
+    <div class="tool-grid" id="tool-grid"><div class="empty-state"><span class="big-emoji">⏳</span>正在加载数据...</div></div>
+  </section>
+
+  <!-- ---------- 个人数据栏目 ---------- -->
+  <section class="card" id="profile-data-section">
+    <h3 class="section-title">🌐 个人数据</h3>
+    <div class="manage-bar">
+      <button class="manage-btn" onclick="openEditModal('data', -1)">➕ 添加链接</button>
+      <button class="manage-btn ghost" onclick="toggleEditMode()">✏️ <span id="edit-mode-label-2">编辑模式</span></button>
+    </div>
+    <div class="profile-data" id="profile-data-list"><div class="empty-state"><span class="big-emoji">⏳</span>正在加载数据...</div></div>
+  </section>
+
+  <!-- Toast 提示 -->
+  <div class="toast" id="copy-toast">✅ 链接已复制到剪贴板</div>
+
+  <!-- ========== 编辑模态框 ========== -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3 id="edit-modal-title">添加链接</h3>
+      <div class="form-group">
+        <label>名称 / 标题</label>
+        <input type="text" id="edit-name" placeholder="例如：Bilibili 主页" />
+      </div>
+      <div class="form-group">
+        <label>网址 URL</label>
+        <input type="text" id="edit-url" placeholder="例如：https://www.bilibili.com/" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>图标（emoji）</label>
+          <input type="text" id="edit-emoji" placeholder="📺" maxlength="4" />
+        </div>
+        <div class="form-group">
+          <label>配色（渐变）</label>
+          <input type="text" id="edit-color" placeholder="#fb7299,#ff9eb5" />
+          <div class="color-picker-hint">格式：颜色1,颜色2（留空则随机）</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>描述</label>
+        <input type="text" id="edit-desc" placeholder="简单描述一下" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('edit-modal')">取消</button>
+        <button class="btn-save" onclick="saveEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 密码验证模态框（保存到云端时用） ========== -->
+  <div class="modal-overlay" id="password-modal">
+    <div class="modal" style="max-width: 400px;">
+      <h3>🔐 管理员密码</h3>
+      <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 16px;">
+        请输入管理密码以保存到云端。
+      </p>
+      <div class="form-group">
+        <input type="password" id="admin-password" placeholder="请输入密码" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('password-modal')">取消</button>
+        <button class="btn-save" onclick="doSyncToCloud()">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 导入配置模态框 ========== -->
+  <div class="modal-overlay" id="import-modal">
+    <div class="modal" style="max-width: 520px;">
+      <h3>📥 导入配置</h3>
+      <p style="color: var(--text-sub); font-size: 0.88rem; margin-bottom: 12px;">
+        粘贴配置代码（JSON 格式），将覆盖当前的所有链接。
+      </p>
+      <div class="form-group">
+        <textarea id="import-text" rows="8" placeholder="粘贴配置代码..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('import-modal')">取消</button>
+        <button class="btn-save" onclick="importConfig()">导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入云端计数器 -->
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<!-- ---------- 访问计数器 ---------- -->
+<section class="card counter">
+    🔥 本站总访问量 <span id="busuanzi_value_site_pv" class="counter-num">加载中...</span> 次
+</section>
+
+</main>
+
+<!-- ========== 页脚 ========== -->
+<footer class="footer">
+  <hr class="footer-divider" />
+  © 2026 我的工具箱 | 持续更新中 ✨
+</footer>
+
+<!-- ====================== JavaScript ====================== -->
+<script>
+
+/* ==========================================
+   功能 1：暗黑 / 明亮 模式切换（带本地记忆）
+   ========================================== */
+(function initThemeToggle() {
+  const toggleBtn = document.getElementById('theme-toggle');
+  const savedTheme = localStorage.getItem('toolbox-theme');
+
+  // 如果之前选过明亮模式，应用之
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    toggleBtn.textContent = '☀️';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    toggleBtn.textContent = isLight ? '☀️' : '🌙';
+    // 保存用户偏好
+    localStorage.setItem('toolbox-theme', isLight ? 'light' : 'dark');
+  });
+})();
+
+
+/* ==========================================
+   新功能：随机自我描述文字
+   👉 文字库位置：下面的 quoteList 数组
+   每次进入网页，会从中随机挑选一条显示
+   ========================================== */
+(function initRandomTip() {
+  // ====== 👇 文字库：在这里添加/修改你的句子 ======
+  const quoteList = [
+    "你会发现每次进来这行文字都会发生变化",
+    "我草，高等数学好几把难",
+    "我要打舞萌啊！我要打舞萌啊！我要打舞萌啊！我要打舞萌啊！我要打舞萌啊！我要打舞萌啊！",
+    "VS Code 救了我的命，事情是这样的......",
+    "依旧劣质静态网站",
+    "我要毁灭北城中学",
+    "你是？",
+    "沙漠之狐向你致敬"
+  ];
+  // ====== 👆 文字库结束 ======
+
+  const el = document.getElementById('random-tip');
+  // 随机挑一条
+  const randomIndex = Math.floor(Math.random() * quoteList.length);
+  el.textContent = quoteList[randomIndex];
+
+  // 淡入动画
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.8s ease';
+  setTimeout(() => { el.style.opacity = '1'; }, 150);
+})();
+
+
+/* ==========================================
+   功能 2：标题打字淡入效果
+   ========================================== */
+(function typeLogoEffect() {
+  const logoEl = document.getElementById('logo-text');
+  // 把文字拆分成一个个字符，分别加动画延迟
+  const originalText = logoEl.textContent;
+  logoEl.innerHTML = '';
+  [...originalText].forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'title-char';
+    span.textContent = ch === ' ' ? '\u00A0' : ch;
+    span.style.animationDelay = (i * 0.08) + 's';
+    logoEl.appendChild(span);
+  });
+})();
+
+
+/* ==========================================
+   功能 4：卡片滚动进入可视区域时淡入动画
+   ========================================== */
+(function initScrollReveal() {
+  const cards = document.querySelectorAll('.card, .tool-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  // 工具卡片设置初始状态
+  document.querySelectorAll('.tool-card').forEach((el, idx) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = `all 0.5s ease ${idx * 0.06}s`;
+  });
+
+  // 数据卡片设置初始状态
+  document.querySelectorAll('.data-card').forEach((el, idx) => {
+    el.style.transition = `all 0.5s ease ${idx * 0.07}s`;
+    el.addEventListener('click', (e) => {
+      // 点击整个卡片跳转（避免按钮点击冒泡）
+      if (!e.target.closest('.data-btn')) {
+        const url = el.dataset.url;
+        if (url) window.open(url, '_blank');
+      }
+    });
+  });
+
+  cards.forEach((el) => observer.observe(el));
+})();
+
+
+/* ==========================================
+   新功能：个人数据卡片滚动淡入
+   ========================================== */
+(function initDataCards() {
+  const dataCards = document.querySelectorAll('.data-card');
+  const dataObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const idx = Array.from(dataCards).indexOf(entry.target);
+        setTimeout(() => {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }, idx * 70);
+        dataObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  dataCards.forEach((el) => dataObserver.observe(el));
+})();
+
+
+/* ==========================================
+   新功能：复制链接到剪贴板（带 Toast 提示）
+   ========================================== */
+function copyLink(btn) {
+  const url = btn.dataset.url;
+  const toast = document.getElementById('copy-toast');
+  
+  const fallbackCopy = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+    } catch (e) {}
+    document.body.removeChild(textarea);
+  };
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(() => {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }).catch(() => {
+      fallbackCopy(url);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    });
+  } else {
+    fallbackCopy(url);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+}
+
+
+/* ==========================================
+   功能 5：背景粒子效果（Canvas，性能友好）
+   ========================================== */
+(function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let width, height;
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // 根据屏幕大小决定粒子数量，手机上减少以提升性能
+  const PARTICLE_COUNT = Math.min(60, Math.floor((width * height) / 25000));
+
+  // 创建粒子
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.8 + 0.6
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // 根据当前主题选择粒子颜色
+    const isLight = document.body.classList.contains('light-mode');
+    const particleColor = isLight ? 'rgba(91, 64, 224, ' : 'rgba(180, 170, 255, ';
+
+    // 绘制每个粒子
+    particles.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      // 到达边界反弹
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = particleColor + '0.5)';
+      ctx.fill();
+    });
+
+    // 绘制粒子间连线
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = particleColor + (0.15 * (1 - dist / 120)) + ')';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+
+</script>
+
+</body>
+</html>
