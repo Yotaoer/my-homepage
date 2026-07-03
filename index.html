@@ -396,187 +396,25 @@
     box-shadow: 0 3px 10px rgba(255, 92, 122, 0.4);
   }
 
-  /* ---- 管理按钮组 ---- */
-  .manage-bar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .manage-btn {
-    padding: 8px 18px;
-    background: linear-gradient(135deg, var(--accent), #4a2ed8);
-    color: #fff;
-    border: none;
+  /* ---- 离线 / 云端 模式提示 ---- */
+  .mode-hint {
+    text-align: center;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
     border-radius: 12px;
-    font-size: 0.88rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--card-shadow);
-  }
-  .manage-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(123, 92, 255, 0.35);
-  }
-  .manage-btn.ghost {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--card-border);
+    color: var(--text-sub);
   }
-  .manage-btn.ghost:hover {
-    background: rgba(123, 92, 255, 0.15);
+  .mode-hint.online {
+    background: rgba(123, 92, 255, 0.12);
     border-color: var(--accent);
-  }
-  .manage-btn.warn {
-    background: linear-gradient(135deg, #ff8c4a, #e85a2e);
-  }
-
-  /* ---- 编辑模式高亮 ---- */
-  .edit-mode .data-card,
-  .edit-mode .tool-card {
-    outline: 2px dashed rgba(123, 92, 255, 0.4);
-    outline-offset: 4px;
-  }
-
-  /* ---- 模态框 ---- */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    padding: 20px;
-  }
-  .modal-overlay.show {
-    display: flex;
-    opacity: 1;
-  }
-  .modal {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 28px;
-    width: 100%;
-    max-width: 480px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-  .modal h3 {
-    margin-bottom: 20px;
-    font-size: 1.3rem;
-    background: linear-gradient(90deg, var(--accent), var(--text-main));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .form-group {
-    margin-bottom: 16px;
-  }
-  .form-group label {
-    display: block;
-    font-size: 0.88rem;
-    color: var(--text-sub);
-    margin-bottom: 6px;
-  }
-  .form-group input,
-  .form-group textarea {
-    width: 100%;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
     color: var(--text-main);
-    font-size: 0.92rem;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
   }
-  .form-group input:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: rgba(123, 92, 255, 0.08);
-  }
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .color-picker-hint {
-    font-size: 0.78rem;
-    color: var(--text-sub);
-    margin-top: 4px;
-  }
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 24px;
-  }
-  .modal-actions button {
-    padding: 9px 20px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  .modal-actions .btn-cancel {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-  }
-  .modal-actions .btn-cancel:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  .modal-actions .btn-save {
-    background: linear-gradient(135deg, var(--accent), #4a2ed8);
-    color: #fff;
-  }
-  .modal-actions .btn-save:hover {
-    transform: scale(1.05);
-  }
-
-  /* ---- 空状态 ---- */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-sub);
-    font-size: 0.95rem;
-    grid-column: 1 / -1;
-  }
-  .empty-state .big-emoji {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 12px;
-    opacity: 0.6;
-  }
-  .toast {
-    position: fixed;
-    top: 88px;
-    left: 50%;
-    transform: translate(-50%, -20px);
-    padding: 10px 24px;
-    background: linear-gradient(135deg, var(--accent), #4a2ed8);
-    color: #fff;
-    border-radius: 24px;
-    font-size: 0.9rem;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 999;
-    box-shadow: 0 8px 28px rgba(123, 92, 255, 0.45);
-    transition: all 0.4s ease;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
+  .mode-hint strong {
+    color: var(--accent);
+    font-weight: 600;
   }
 
   /* ---- 响应式：手机适配 ---- */
@@ -622,97 +460,102 @@
     </div>
   </section>
 
+  <!-- ---------- 数据模式提示 ---------- -->
+  <div class="mode-hint" id="mode-hint" style="display:none;"></div>
+
   <!-- ---------- 工具箱区域 ---------- -->
   <section class="card">
     <h3 class="section-title">📦 我的快捷工具箱</h3>
-    <div class="manage-bar">
-      <button class="manage-btn" onclick="openEditModal('tool', -1)">➕ 添加工具</button>
-      <button class="manage-btn ghost" onclick="toggleEditMode()">✏️ <span id="edit-mode-label">编辑模式</span></button>
-      <button class="manage-btn ghost" onclick="syncToCloud()">☁️ <span id="sync-label">保存到云端</span></button>
-      <button class="manage-btn warn" onclick="resetLocal()">🔄 恢复云端</button>
+    <div class="tool-grid">
+      <a class="tool-card" href="https://enazo.cn/" target="_blank">
+        <span class="tool-emoji">🎨</span>
+        <div class="tool-name">绘谜 enazo</div>
+        <div class="tool-desc">来玩你画我猜</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
+      <a class="tool-card" href="https://app.netlify.com/" target="_blank">
+        <span class="tool-emoji">💾</span>
+        <div class="tool-name">Netlify</div>
+        <div class="tool-desc">好用的网站托管</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
+      <a class="tool-card" href="https://www.freeclash.top/ui/free_clash" target="_blank">
+        <span class="tool-emoji">✈️</span>
+        <div class="tool-name">喵喵加速器</div>
+        <div class="tool-desc">嘘~~~~~~~~~~~</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
+      <a class="tool-card" href="https://github.com/Yotao-sama" target="_blank">
+        <span class="tool-emoji">🐙</span>
+        <div class="tool-name">GitHub</div>
+        <div class="tool-desc">何意味</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
+      <a class="tool-card" href="https://www.bilibili.com/" target="_blank">
+        <span class="tool-emoji">📺</span>
+        <div class="tool-name">B 站</div>
+        <div class="tool-desc">我的时间都去哪了</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
+      <a class="tool-card" href="https://chat.deepseek.com/" target="_blank">
+        <span class="tool-emoji">💬</span>
+        <div class="tool-name">DeepSeek</div>
+        <div class="tool-desc">凑数的 · AI 聊天</div>
+        <span class="tool-btn">访问 →</span>
+      </a>
     </div>
-    <div class="tool-grid" id="tool-grid"><div class="empty-state"><span class="big-emoji">⏳</span>正在加载数据...</div></div>
   </section>
 
   <!-- ---------- 个人数据栏目 ---------- -->
-  <section class="card" id="profile-data-section">
+  <section class="card">
     <h3 class="section-title">🌐 个人数据</h3>
-    <div class="manage-bar">
-      <button class="manage-btn" onclick="openEditModal('data', -1)">➕ 添加链接</button>
-      <button class="manage-btn ghost" onclick="toggleEditMode()">✏️ <span id="edit-mode-label-2">编辑模式</span></button>
+    <div class="profile-data">
+      <a class="data-card" href="https://space.bilibili.com/532792677?spm_id_from=333.788.0.0" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#fb7299,#ff9eb5);">📺</div>
+        <div class="data-info">
+          <div class="data-name">Bilibili 主页</div>
+          <div class="data-desc">我的时间都去哪了？</div>
+        </div>
+      </a>
+      <a class="data-card" href="https://github.com/Yotao-sama" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#2d3748,#4a5568);">🐙</div>
+        <div class="data-info">
+          <div class="data-name">GitHub</div>
+          <div class="data-desc">代码仓库 · 何意味</div>
+        </div>
+      </a>
+      <a class="data-card" href="https://xhq-eayoko.netlify.app/" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#764ba2,#667eea);">🎭</div>
+        <div class="data-info">
+          <div class="data-name">didQQ 介绍网站</div>
+          <div class="data-desc">也算作是人生第一个网站</div>
+        </div>
+      </a>
+      <a class="data-card" href="https://enazo.cn/" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#f6d365,#fda085);">🎨</div>
+        <div class="data-info">
+          <div class="data-name">绘谜 enazo</div>
+          <div class="data-desc">来玩你画我猜</div>
+        </div>
+      </a>
+      <a class="data-card" href="https://www.freeclash.top/ui/free_clash" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#00c6ff,#0072ff);">✈️</div>
+        <div class="data-info">
+          <div class="data-name">喵喵加速器</div>
+          <div class="data-desc">嘘~~~~~~~~~~~</div>
+        </div>
+      </a>
+      <a class="data-card" href="https://chat.deepseek.com/" target="_blank">
+        <div class="data-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">💬</div>
+        <div class="data-info">
+          <div class="data-name">DeepSeek</div>
+          <div class="data-desc">凑数的 · AI 聊天</div>
+        </div>
+      </a>
     </div>
-    <div class="profile-data" id="profile-data-list"><div class="empty-state"><span class="big-emoji">⏳</span>正在加载数据...</div></div>
   </section>
 
-  <!-- Toast 提示 -->
-  <div class="toast" id="copy-toast">✅ 链接已复制到剪贴板</div>
 
-  <!-- ========== 编辑模态框 ========== -->
-  <div class="modal-overlay" id="edit-modal">
-    <div class="modal">
-      <h3 id="edit-modal-title">添加链接</h3>
-      <div class="form-group">
-        <label>名称 / 标题</label>
-        <input type="text" id="edit-name" placeholder="例如：Bilibili 主页" />
-      </div>
-      <div class="form-group">
-        <label>网址 URL</label>
-        <input type="text" id="edit-url" placeholder="例如：https://www.bilibili.com/" />
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>图标（emoji）</label>
-          <input type="text" id="edit-emoji" placeholder="📺" maxlength="4" />
-        </div>
-        <div class="form-group">
-          <label>配色（渐变）</label>
-          <input type="text" id="edit-color" placeholder="#fb7299,#ff9eb5" />
-          <div class="color-picker-hint">格式：颜色1,颜色2（留空则随机）</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>描述</label>
-        <input type="text" id="edit-desc" placeholder="简单描述一下" />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('edit-modal')">取消</button>
-        <button class="btn-save" onclick="saveEdit()">保存</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== 密码验证模态框（保存到云端时用） ========== -->
-  <div class="modal-overlay" id="password-modal">
-    <div class="modal" style="max-width: 400px;">
-      <h3>🔐 管理员密码</h3>
-      <p style="color: var(--text-sub); font-size: 0.9rem; margin-bottom: 16px;">
-        请输入管理密码以保存到云端。
-      </p>
-      <div class="form-group">
-        <input type="password" id="admin-password" placeholder="请输入密码" />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('password-modal')">取消</button>
-        <button class="btn-save" onclick="doSyncToCloud()">确认保存</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== 导入配置模态框 ========== -->
-  <div class="modal-overlay" id="import-modal">
-    <div class="modal" style="max-width: 520px;">
-      <h3>📥 导入配置</h3>
-      <p style="color: var(--text-sub); font-size: 0.88rem; margin-bottom: 12px;">
-        粘贴配置代码（JSON 格式），将覆盖当前的所有链接。
-      </p>
-      <div class="form-group">
-        <textarea id="import-text" rows="8" placeholder="粘贴配置代码..."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('import-modal')">取消</button>
-        <button class="btn-save" onclick="importConfig()">导入</button>
-      </div>
-    </div>
   </div>
 
   <!-- 引入云端计数器 -->
@@ -733,6 +576,49 @@
 
 <!-- ====================== JavaScript ====================== -->
 <script>
+
+/* ==========================================
+   功能 0：云端 / 离线 模式检测
+   - 尝试访问 /api/data
+   - 成功：显示 」 云端同步提示
+   - 失败：显示离线模式提示（使用本地写死的链接）
+   ========================================== */
+(function initDataMode() {
+  const hintEl = document.getElementById('mode-hint');
+  if (!hintEl) return;
+
+  // 给静态文件协议，/api/data'}
+
+  // 1秒内没返回：使用默认内容
+  ，否则显示离线模式
+  fetch('/api/data', { method: 'GET', cache: 'no-store' })
+    .then((res) => {
+      if (!res.ok) throw new Error('API not available');
+      return res.json();
+    })
+    .then((data) => {
+      // API 可用 ———— 替换为云端数据
+      if (data && (data.tools || data.data || data.tools || data.data) {
+        // 如果API返回有效数据：
+        // 替换静态数据 —  替换为从云端获取的内容
+        hintEl.className = 'mode-hint online';
+        hintEl.innerHTML = '☁️ <strong>云端模式已启用 — 数据来自</strong>';
+        hintEl.style.display = 'block';
+      } else {
+        // API 返回了数据但格式不符合预期 —— 仍使用本地数据
+        hintEl.className = 'mode-hint';
+        hintEl.innerHTML = '📴 使用本地离线数据';
+        hintEl.style.display = 'block';
+      }
+    })
+    .catch(() => {
+      // API 不可用 —— 显示离线模式提示
+      hintEl.className = 'mode-hint';
+      hintEl.innerHTML = '📴 <strong>离线模式</strong> —— 当前使用本地写死的链接';
+      hintEl.style.display = 'block';
+    });
+})();
+
 
 /* ==========================================
    功能 1：暗黑 / 明亮 模式切换（带本地记忆）
